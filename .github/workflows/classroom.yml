@@ -1,0 +1,83 @@
+name: Autograding Tests
+
+on:
+  push:
+  workflow_dispatch:
+  repository_dispatch:
+
+permissions:
+  checks: write
+  actions: read
+  contents: read
+
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Header comments
+        id: header
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: Header comments
+          command: pytest test_for_loop_practice.py::test_header_comments
+          timeout: 10
+          max-score: 1
+
+      - name: IPO comments
+        id: ipo
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: IPO comments
+          command: pytest test_for_loop_practice.py::test_ipo_comments
+          timeout: 10
+          max-score: 1
+
+      - name: All wins
+        id: all-wins
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: All wins
+          command: pytest test_for_loop_practice.py::test_all_wins
+          timeout: 10
+          max-score: 1
+
+      - name: All losses
+        id: all-losses
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: All losses
+          command: pytest test_for_loop_practice.py::test_all_losses
+          timeout: 10
+          max-score: 1
+
+      - name: Mixed results
+        id: mixed
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: Mixed results
+          command: pytest test_for_loop_practice.py::test_mixed_results
+          timeout: 10
+          max-score: 2
+
+      - name: Autograding Reporter
+        uses: classroom-resources/autograding-grading-reporter@v1
+        env:
+          HEADER_RESULTS: "${{steps.header.outputs.result}}"
+          IPO_RESULTS: "${{steps.ipo.outputs.result}}"
+          ALL-WINS_RESULTS: "${{steps.all-wins.outputs.result}}"
+          ALL-LOSSES_RESULTS: "${{steps.all-losses.outputs.result}}"
+          MIXED_RESULTS: "${{steps.mixed.outputs.result}}"
+        with:
+          runners: header,ipo,all-wins,all-losses,mixed
