@@ -1,5 +1,5 @@
 ## Setup
-1. Git Clone this repository in your Unit 1 Practice Folder
+1. Git Clone this repository in your Unti 2 Folder
 2. Make a file called for_loop_practice.py in this folder. 
 
 ## Instructions
